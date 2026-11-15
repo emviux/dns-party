@@ -125,7 +125,15 @@ namespace DNSParty.UI
                         {
                             if (s != null)
                             {
-                                _cachedAppIcon = new Icon(s);
+                                // Write to a temp file to preserve multiple resolutions!
+                                string tempFile = Path.Combine(Path.GetTempPath(), "dnsparty_temp_" + Guid.NewGuid().ToString("N") + ".ico");
+                                using (FileStream fs = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
+                                {
+                                    s.CopyTo(fs);
+                                }
+                                _cachedAppIcon = new Icon(tempFile);
+                                // Try to delete immediately, though it might be locked; not a big deal for a temp file.
+                                try { File.Delete(tempFile); } catch { }
                                 return _cachedAppIcon;
                             }
                         }

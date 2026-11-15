@@ -50,6 +50,8 @@
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\DnsService.cs" />
     <Compile Include="Services\SoundService.cs" />
+    <Compile Include="Services\UpdateService.cs" />
+    <Compile Include="VersionInfo.cs" />
     <Compile Include="UI\AddEditDnsDialog.cs" />
     <Compile Include="UI\IconRenderer.cs" />
     <Compile Include="UI\MainForm.cs" />

@@ -12,8 +12,8 @@ using DNSParty.UI;
 [assembly: AssemblyCompany("DNS Party")]
 [assembly: AssemblyProduct("DNS Party")]
 [assembly: AssemblyCopyright("Copyright © 2026 DNS Party")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion(DNSParty.VersionInfo.CurrentVersion + ".0")]
+[assembly: AssemblyFileVersion(DNSParty.VersionInfo.CurrentVersion + ".0")]
 
 namespace DNSParty
 {

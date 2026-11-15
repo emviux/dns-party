@@ -35,16 +35,28 @@ echo [1/3] Compiling DNSParty.exe...
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-24.png",DNSParty.tray-error-24.png ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-32.png",DNSParty.tray-error-32.png ^
     /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Web.Extensions.dll /r:System.Net.Http.dll ^
-    "src\DNSParty\Models\*.cs" "src\DNSParty\Services\*.cs" "src\DNSParty\UI\*.cs" "src\DNSParty\Program.cs"
+    "src\DNSParty\VersionInfo.cs" "src\DNSParty\Models\*.cs" "src\DNSParty\Services\*.cs" "src\DNSParty\UI\*.cs" "src\DNSParty\Program.cs"
 
 if errorlevel 1 (
     echo [ERROR] Compilation failed.
     exit /b 1
 )
 
-echo [2/3] Copying Portable executable...
+echo [2/3] Copying Portable executable and building Installer...
 copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable.exe" >nul
 copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable\DNSParty.exe" >nul
+
+powershell -Command "if (Test-Path 'build\Payload.zip') { Remove-Item 'build\Payload.zip' }; Compress-Archive -Path 'build\DNSParty.exe' -DestinationPath 'build\Payload.zip' -Force"
+powershell -Command "if (Test-Path 'dist\DNSParty-Portable.zip') { Remove-Item 'dist\DNSParty-Portable.zip' }; Compress-Archive -Path 'dist\DNSParty-Portable\*' -DestinationPath 'dist\DNSParty-Portable.zip' -Force"
+
+"%CSC%" /nologo /target:winexe /optimize+ /out:"dist\DNSParty-Setup.exe" ^
+    /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
+    /win32manifest:"src\DNSParty\app.manifest" ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico",DNSParty.app.ico ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png",DNSParty.installer-logo-512.png ^
+    /resource:"build\Payload.zip",DNSParty.Payload.zip ^
+    /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll ^
+    "src\Installer\InstallerProgram.cs" "src\DNSParty\VersionInfo.cs"
 
 echo [3/3] Running Automated QA Verification Suite...
 "%CSC%" /nologo /target:exe /optimize+ /out:"build\DNSPartyTests.exe" ^
@@ -56,6 +68,6 @@ echo ============================================================
 echo  Build Complete:
 echo   - build\DNSParty.exe
 echo   - dist\DNSParty-Portable.exe
-echo   - dist\DNSParty-Portable-v1.0.0.zip
+echo   - dist\DNSParty-Portable.zip
 echo   - dist\DNSParty-Setup.exe
 echo ============================================================

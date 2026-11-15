@@ -33,6 +33,9 @@ namespace DNSParty.Models
         public string LastChangeText { get; set; }
         public string LastRequestedProfileId { get; set; }
 
+        // Updates
+        public bool AutoCheckUpdates { get; set; }
+
         // Profiles & Favorites persistence
         public bool InitializedProfiles { get; set; }
         public List<string> FavoriteProfileIds { get; set; }
@@ -53,6 +56,7 @@ namespace DNSParty.Models
             EnableSounds = true;
             EnableNotifications = true;
             OverlayShortcut = "Shift+Tab";
+            AutoCheckUpdates = true;
 
             LastChangeText = "Ready";
             LastRequestedProfileId = "cloudflare";

@@ -21,6 +21,8 @@ namespace DNSPartySetup
         private readonly string _installDir;
         private readonly bool _isSilent;
         private readonly bool _isUninstall;
+        private readonly bool _isUpdate;
+        private readonly bool _isPurge;
         private CheckBox _chkDesktopShortcut;
         private CheckBox _chkStartMenuShortcut;
         private CheckBox _chkLaunchNow;
@@ -43,9 +45,17 @@ namespace DNSPartySetup
                 {
                     _isUninstall = true;
                 }
+                else if (string.Equals(a, "/UPDATE", StringComparison.OrdinalIgnoreCase))
+                {
+                    _isUpdate = true;
+                }
+                else if (string.Equals(a, "/PURGE", StringComparison.OrdinalIgnoreCase))
+                {
+                    _isPurge = true;
+                }
             }
 
-            Text = "DNS Party v1.0.0 — Setup";
+            Text = $"DNS Party v{DNSParty.VersionInfo.CurrentVersion} — Setup";
             Size = new Size(480, 340);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
@@ -64,7 +74,13 @@ namespace DNSPartySetup
                 {
                     if (icoStream != null)
                     {
-                        Icon = new Icon(icoStream);
+                        string tempFile = Path.Combine(Path.GetTempPath(), "dnsparty_installer_" + Guid.NewGuid().ToString("N") + ".ico");
+                        using (FileStream fs = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
+                        {
+                            icoStream.CopyTo(fs);
+                        }
+                        Icon = new Icon(tempFile);
+                        try { File.Delete(tempFile); } catch { }
                     }
                     else
                     {
@@ -102,7 +118,7 @@ namespace DNSPartySetup
 
             var lblTitle = new Label
             {
-                Text = "Install DNS Party v1.0.0",
+                Text = $"Install DNS Party v{DNSParty.VersionInfo.CurrentVersion}",
                 Font = new Font("Segoe UI", 14f, FontStyle.Bold),
                 ForeColor = Color.FromArgb(167, 139, 250),
                 Location = new Point(textLeft, 18),
@@ -200,6 +216,23 @@ namespace DNSPartySetup
             return -1;
         }
 
+        private void KillDNSPartyProcesses()
+        {
+            try
+            {
+                foreach (Process p in Process.GetProcessesByName("DNSParty"))
+                {
+                    try
+                    {
+                        p.Kill();
+                        p.WaitForExit(3000);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
         private bool RunInstall(bool silent)
         {
             try
@@ -210,6 +243,8 @@ namespace DNSPartySetup
                     _lblStatus.Text = "Extracting DNS Party files...";
                     Application.DoEvents();
                 }
+
+                KillDNSPartyProcesses();
 
                 if (!Directory.Exists(_installDir))
                 {
@@ -270,7 +305,17 @@ namespace DNSPartySetup
                     CreateShortcut(startLink, targetExe, _installDir, "DNS Party — Windows DNS Manager");
                 }
 
-                RegisterUninstaller(targetExe);
+                string uninstallerPath = Path.Combine(_installDir, "Uninstall.exe");
+                try
+                {
+                    if (!string.Equals(Application.ExecutablePath, uninstallerPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Copy(Application.ExecutablePath, uninstallerPath, true);
+                    }
+                }
+                catch { }
+
+                RegisterUninstaller(targetExe, uninstallerPath);
 
                 if (!silent)
                 {
@@ -284,7 +329,7 @@ namespace DNSPartySetup
                             UseShellExecute = true
                         });
                     }
-                    MessageBox.Show(this, "DNS Party v1.0.0 has been installed to:\r\n" + _installDir, "DNS Party Setup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(this, $"DNS Party v{DNSParty.VersionInfo.CurrentVersion} has been installed to:\r\n" + _installDir, "DNS Party Setup", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Close();
                 }
 
@@ -306,21 +351,72 @@ namespace DNSPartySetup
         {
             try
             {
+                KillDNSPartyProcesses();
+
+                bool purge = _isPurge;
+                if (!_isSilent && !purge)
+                {
+                    var result = MessageBox.Show(
+                        "Do you also want to delete personal settings (configurations, logs, etc.)?",
+                        "DNS Party Uninstall",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                    if (result == DialogResult.Yes)
+                    {
+                        purge = true;
+                    }
+                }
+
+                if (purge)
+                {
+                    string configDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DNSParty");
+                    if (Directory.Exists(configDir))
+                    {
+                        try { Directory.Delete(configDir, true); } catch { }
+                    }
+                }
+
                 string desktopLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "DNS Party.lnk");
-                if (File.Exists(desktopLink)) File.Delete(desktopLink);
+                if (File.Exists(desktopLink)) try { File.Delete(desktopLink); } catch { }
 
                 string startLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "DNS Party.lnk");
-                if (File.Exists(startLink)) File.Delete(startLink);
+                if (File.Exists(startLink)) try { File.Delete(startLink); } catch { }
+
+                if (Directory.Exists(_installDir))
+                {
+                    try
+                    {
+                        foreach (string file in Directory.GetFiles(_installDir))
+                        {
+                            if (!string.Equals(file, Application.ExecutablePath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                try { File.Delete(file); } catch { }
+                            }
+                        }
+                        foreach (string dir in Directory.GetDirectories(_installDir))
+                        {
+                            try { Directory.Delete(dir, true); } catch { }
+                        }
+                        
+                        try { Directory.Delete(_installDir, false); } catch { }
+                    }
+                    catch { }
+                }
 
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall", true))
                 {
-                    if (key != null) key.DeleteSubKeyTree("DNSParty", false);
+                    if (key != null) try { key.DeleteSubKeyTree("DNSParty", false); } catch { }
                 }
             }
             catch { }
         }
 
-        private void RegisterUninstaller(string targetExe)
+        private void RegisterUninstaller(string targetExe, string uninstallerPath)
         {
             try
             {
@@ -329,11 +425,26 @@ namespace DNSPartySetup
                     if (key != null)
                     {
                         key.SetValue("DisplayName", "DNS Party — Windows DNS Manager");
-                        key.SetValue("DisplayVersion", "1.0.0");
-                        key.SetValue("Publisher", "DNS Party");
+                        key.SetValue("DisplayVersion", DNSParty.VersionInfo.CurrentVersion);
+                        key.SetValue("Publisher", DNSParty.VersionInfo.Publisher);
                         key.SetValue("DisplayIcon", targetExe);
                         key.SetValue("InstallLocation", _installDir);
-                        key.SetValue("UninstallString", "\"" + Application.ExecutablePath + "\" /U");
+                        key.SetValue("UninstallString", "\"" + uninstallerPath + "\" /U");
+                        key.SetValue("QuietUninstallString", "\"" + uninstallerPath + "\" /U /S");
+                        key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
+                        long sizeInBytes = 0;
+                        if (Directory.Exists(_installDir))
+                        {
+                            try
+                            {
+                                foreach (string file in Directory.GetFiles(_installDir, "*", SearchOption.AllDirectories))
+                                {
+                                    sizeInBytes += new FileInfo(file).Length;
+                                }
+                            }
+                            catch { }
+                        }
+                        key.SetValue("EstimatedSize", (int)(sizeInBytes / 1024), RegistryValueKind.DWord);
                         key.SetValue("NoModify", 1, RegistryValueKind.DWord);
                         key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
                     }

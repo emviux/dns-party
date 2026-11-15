@@ -36,6 +36,7 @@ namespace DNSParty.UI
         private readonly ConfigService _configService;
         private readonly DnsService _dnsService;
         private readonly SoundService _soundService;
+        private readonly UpdateService _updateService;
         private readonly bool _startMinimized;
 
         private NotifyIcon _notifyIcon;
@@ -106,6 +107,7 @@ namespace DNSParty.UI
             _dnsService = dnsService;
             _soundService = soundService;
             _startMinimized = startMinimized || _configService.Settings.StartMinimized;
+            _updateService = new UpdateService(_configService);
 
             _hotkeyService = new HotkeyService();
             _hotkeyService.RegisterShortcut(_configService.Settings.OverlayShortcut);
@@ -1227,9 +1229,9 @@ namespace DNSParty.UI
                 }
             }
 
-            // Bottom-left footer: audio wave icon + DNS Party v1.0.0
-            RectangleF waveRect = new RectangleF(24, h - 54, 24, 24);
-            IconRenderer.DrawAudioWaveIcon(g, waveRect, Theme.AccentViolet);
+            // Bottom-left footer: DNS Party Logo + v1.0.0
+            RectangleF logoRect = new RectangleF(24, h - 54, 24, 24);
+            IconRenderer.DrawAppLogo(g, logoRect, false);
 
             using (Font fTitle = Theme.CreateSemiboldFont(9f))
             using (Font fVer = Theme.CreateFont(8.2f))
@@ -1662,18 +1664,18 @@ namespace DNSParty.UI
             int col2X = left + colW + 20;
 
             // Left Column: General & DNS
-            DrawSettingsCard(g, new Rectangle(col1X, 134, colW, 224), "General");
+            DrawSettingsCard(g, new Rectangle(col1X, 134, colW, 204), "General");
             DrawToggleRow(g, "set_start_win", col1X + 18, 174, colW - 36, "Start with Windows", _configService.Settings.StartWithWindows);
             DrawToggleRow(g, "set_min_tray", col1X + 18, 214, colW - 36, "Minimize to system tray", _configService.Settings.MinimizeToTray);
             DrawToggleRow(g, "set_close_tray", col1X + 18, 254, colW - 36, "Close button minimizes to tray", _configService.Settings.CloseMinimizesToTray);
             DrawToggleRow(g, "set_start_min", col1X + 18, 294, colW - 36, "Start minimized in background", _configService.Settings.StartMinimized);
 
-            DrawSettingsCard(g, new Rectangle(col1X, 374, colW, 232), "DNS & Network Adapter");
-            DrawToggleRow(g, "set_auto_adapter", col1X + 18, 414, colW - 36, "Automatically detect active adapter", _configService.Settings.AutoDetectAdapter);
-            DrawToggleRow(g, "set_confirm_disable", col1X + 18, 454, colW - 36, "Confirm before disabling DNS", _configService.Settings.ConfirmBeforeDisable);
+            DrawSettingsCard(g, new Rectangle(col1X, 348, colW, 184), "DNS & Network Adapter");
+            DrawToggleRow(g, "set_auto_adapter", col1X + 18, 388, colW - 36, "Automatically detect active adapter", _configService.Settings.AutoDetectAdapter);
+            DrawToggleRow(g, "set_confirm_disable", col1X + 18, 428, colW - 36, "Confirm before disabling DNS", _configService.Settings.ConfirmBeforeDisable);
 
             // Adapter selector button
-            Rectangle adapterBox = new Rectangle(col1X + 18, 502, colW - 36, 42);
+            Rectangle adapterBox = new Rectangle(col1X + 18, 476, colW - 36, 42);
             _settingsHitRects["set_cycle_adapter"] = adapterBox;
             string adapterLabel = _configService.Settings.AutoDetectAdapter
                 ? ("Auto: " + (_currentSnapshot != null ? _currentSnapshot.AdapterName : "Active Adapter"))
@@ -1688,6 +1690,28 @@ namespace DNSParty.UI
                 Theme.DrawRoundedRect(g, ap, adapterBox, 8);
                 IconRenderer.DrawIcon(g, "wifi", new RectangleF(adapterBox.X + 12, adapterBox.Y + 12, 18, 18), Theme.AccentViolet);
                 g.DrawString(adapterLabel + "  (Click to switch)", af, at, adapterBox.X + 38, adapterBox.Y + 12);
+            }
+
+            // Updates card
+            DrawSettingsCard(g, new Rectangle(col1X, 542, colW, 120), "Updates");
+            using (Font vf = Theme.CreateFont(9.5f))
+            using (SolidBrush vb = new SolidBrush(Theme.TextSecondary))
+            {
+                g.DrawString("Current Version: " + DNSParty.VersionInfo.CurrentVersion, vf, vb, col1X + 18, 582);
+            }
+            DrawToggleRow(g, "set_auto_update", col1X + colW - 200, 578, 182, "Check automatically", _configService.Settings.AutoCheckUpdates);
+
+            Rectangle btnUpdate = new Rectangle(col1X + 18, 610, colW - 36, 38);
+            if (_updateService.IsUpdateAvailable)
+            {
+                _settingsHitRects["set_download_update"] = btnUpdate;
+                string btnText = _updateService.IsDownloading ? $"Downloading... {_updateService.DownloadProgress}%" : $"Download Update ({_updateService.LatestVersion})";
+                DrawPillButton(g, btnUpdate, "download", btnText, true, _hoveredElement == "set_download_update");
+            }
+            else
+            {
+                _settingsHitRects["set_check_update"] = btnUpdate;
+                DrawPillButton(g, btnUpdate, "refresh", "Check for Updates", false, _hoveredElement == "set_check_update");
             }
 
             // Right Column: Appearance, Sound, Notifications, In-Game Overlay, Maintenance
@@ -2141,6 +2165,35 @@ namespace DNSParty.UI
                     case "set_test_sound":
                         _soundService.PlayConnect(true);
                         ShowBannerNotification("Played connection chime.", false);
+                        break;
+                    case "set_auto_update":
+                        s.AutoCheckUpdates = !s.AutoCheckUpdates;
+                        break;
+                    case "set_check_update":
+                        ShowBannerNotification("Checking for updates...", false);
+#pragma warning disable CS4014
+                        _updateService.CheckForUpdatesAsync().ContinueWith(t => {
+                            if (IsHandleCreated && !IsDisposed) {
+                                if (InvokeRequired) BeginInvoke(new Action(Invalidate));
+                                else Invalidate();
+                            }
+                        });
+#pragma warning restore CS4014
+                        break;
+                    case "set_download_update":
+#pragma warning disable CS4014
+                        _updateService.DownloadUpdateAsync(p => {
+                            if (IsHandleCreated && !IsDisposed) {
+                                if (InvokeRequired) BeginInvoke(new Action(Invalidate));
+                                else Invalidate();
+                            }
+                        }).ContinueWith(t => {
+                            if (IsHandleCreated && !IsDisposed) {
+                                if (InvokeRequired) BeginInvoke(new Action(() => _updateService.InstallUpdateAndRestart()));
+                                else _updateService.InstallUpdateAndRestart();
+                            }
+                        });
+#pragma warning restore CS4014
                         break;
                     case "set_reset_defaults":
                         _configService.ResetDefaultProfiles();

@@ -168,18 +168,42 @@ namespace DNSParty.UI
             }
         }
 
+        private Form _dimmingForm;
+
         public void ShowOverlay()
         {
             RefreshState();
             RecalculateLayout();
+            
+            Screen screen = Screen.FromPoint(Cursor.Position);
+
+            if (_dimmingForm == null || _dimmingForm.IsDisposed)
+            {
+                _dimmingForm = new Form();
+                _dimmingForm.FormBorderStyle = FormBorderStyle.None;
+                _dimmingForm.StartPosition = FormStartPosition.Manual;
+                _dimmingForm.BackColor = Color.Black;
+                _dimmingForm.Opacity = 0.60;
+                _dimmingForm.ShowInTaskbar = false;
+                _dimmingForm.TopMost = true;
+                _dimmingForm.Click += (s, e) => HideOverlay();
+            }
+
+            _dimmingForm.Bounds = screen.Bounds;
+            
+            if (!_dimmingForm.Visible)
+            {
+                _dimmingForm.Show();
+            }
+
             if (!Visible)
             {
-                Screen screen = Screen.FromPoint(Cursor.Position);
                 Location = new Point(
                     screen.WorkingArea.Left + (screen.WorkingArea.Width - Width) / 2,
                     screen.WorkingArea.Top + (screen.WorkingArea.Height - Height) / 2);
                 Show();
             }
+            
             Activate();
             BringToFront();
             Invalidate();
@@ -190,6 +214,11 @@ namespace DNSParty.UI
 
         public void HideOverlay()
         {
+            if (_dimmingForm != null && !_dimmingForm.IsDisposed)
+            {
+                _dimmingForm.Hide();
+            }
+
             if (Visible)
             {
                 Hide();
@@ -206,6 +235,17 @@ namespace DNSParty.UI
             {
                 ShowOverlay();
             }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            if (_dimmingForm != null && !_dimmingForm.IsDisposed)
+            {
+                _dimmingForm.Close();
+                _dimmingForm.Dispose();
+                _dimmingForm = null;
+            }
+            base.OnFormClosed(e);
         }
 
         public void RefreshState()
