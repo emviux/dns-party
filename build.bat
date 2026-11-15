@@ -1,0 +1,61 @@
+@echo off
+setlocal
+echo ============================================================
+echo  Building DNS Party v1.0.0 (Release, Portable, Installer)
+echo ============================================================
+
+set "CSC=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not exist "%CSC%" (
+    set "CSC=C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+)
+
+if not exist "build" mkdir "build"
+if not exist "dist" mkdir "dist"
+
+echo [1/3] Compiling DNSParty.exe...
+"%CSC%" /nologo /target:winexe /optimize+ /out:"build\DNSParty.exe" ^
+    /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
+    /win32manifest:"src\DNSParty\app.manifest" ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico",DNSParty.app.ico ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Branding\logo-transparent.png",DNSParty.logo-transparent.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Overlay\overlay-badge-256.png",DNSParty.overlay-badge-256.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png",DNSParty.installer-logo-512.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-16.png",DNSParty.tray-default-16.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-20.png",DNSParty.tray-default-20.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-24.png",DNSParty.tray-default-24.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-32.png",DNSParty.tray-default-32.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-16.png",DNSParty.tray-connected-16.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-20.png",DNSParty.tray-connected-20.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-24.png",DNSParty.tray-connected-24.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-32.png",DNSParty.tray-connected-32.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-16.png",DNSParty.tray-changing-16.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-24.png",DNSParty.tray-changing-24.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-32.png",DNSParty.tray-changing-32.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-16.png",DNSParty.tray-error-16.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-24.png",DNSParty.tray-error-24.png ^
+    /resource:"assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-32.png",DNSParty.tray-error-32.png ^
+    /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Web.Extensions.dll /r:System.Net.Http.dll ^
+    "src\DNSParty\Models\*.cs" "src\DNSParty\Services\*.cs" "src\DNSParty\UI\*.cs" "src\DNSParty\Program.cs"
+
+if errorlevel 1 (
+    echo [ERROR] Compilation failed.
+    exit /b 1
+)
+
+echo [2/3] Copying Portable executable...
+copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable.exe" >nul
+copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable\DNSParty.exe" >nul
+
+echo [3/3] Running Automated QA Verification Suite...
+"%CSC%" /nologo /target:exe /optimize+ /out:"build\DNSPartyTests.exe" ^
+    /r:"build\DNSParty.exe" /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll ^
+    "tests\TestRunner.cs"
+"build\DNSPartyTests.exe"
+
+echo ============================================================
+echo  Build Complete:
+echo   - build\DNSParty.exe
+echo   - dist\DNSParty-Portable.exe
+echo   - dist\DNSParty-Portable-v1.0.0.zip
+echo   - dist\DNSParty-Setup.exe
+echo ============================================================

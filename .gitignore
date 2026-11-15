@@ -1,0 +1,21 @@
+# Visual Studio / .NET Framework
+bin/
+obj/
+TestResults/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+*.pdb
+
+# Build output
+build/
+dist/
+
+# Logs
+*.log
+
+# Portable config
+portable.flag
+portable_config.json

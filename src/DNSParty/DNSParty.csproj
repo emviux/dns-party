@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8A4E617A-7C91-4A1E-B87E-4D1F9A0E8B22}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>DNSParty</RootNamespace>
+    <AssemblyName>DNSParty</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FrameworkPathOverride>C:\Windows\Microsoft.NET\Framework64\v4.0.30319</FrameworkPathOverride>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <ApplicationIcon>..\..\assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\build\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Models\DnsProfile.cs" />
+    <Compile Include="Models\DnsStatusSnapshot.cs" />
+    <Compile Include="Services\ConfigService.cs" />
+    <Compile Include="Services\DnsService.cs" />
+    <Compile Include="Services\SoundService.cs" />
+    <Compile Include="UI\AddEditDnsDialog.cs" />
+    <Compile Include="UI\IconRenderer.cs" />
+    <Compile Include="UI\MainForm.cs" />
+    <Compile Include="UI\OverlayForm.cs" />
+    <Compile Include="UI\Theme.cs" />
+    <Compile Include="UI\TrayMenuRenderer.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico">
+      <Link>app.ico</Link>
+      <LogicalName>DNSParty.app.ico</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Branding\logo-transparent.png">
+      <LogicalName>DNSParty.logo-transparent.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Overlay\overlay-badge-256.png">
+      <LogicalName>DNSParty.overlay-badge-256.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png">
+      <LogicalName>DNSParty.installer-logo-512.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-16.png">
+      <LogicalName>DNSParty.tray-default-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-20.png">
+      <LogicalName>DNSParty.tray-default-20.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-24.png">
+      <LogicalName>DNSParty.tray-default-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-default-32.png">
+      <LogicalName>DNSParty.tray-default-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-16.png">
+      <LogicalName>DNSParty.tray-connected-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-20.png">
+      <LogicalName>DNSParty.tray-connected-20.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-24.png">
+      <LogicalName>DNSParty.tray-connected-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-connected-32.png">
+      <LogicalName>DNSParty.tray-connected-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-16.png">
+      <LogicalName>DNSParty.tray-changing-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-24.png">
+      <LogicalName>DNSParty.tray-changing-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-changing-32.png">
+      <LogicalName>DNSParty.tray-changing-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-16.png">
+      <LogicalName>DNSParty.tray-error-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-24.png">
+      <LogicalName>DNSParty.tray-error-24.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\assets\new_logos\DNS-Party-Logo-Pack\Tray\tray-error-32.png">
+      <LogicalName>DNSParty.tray-error-32.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
