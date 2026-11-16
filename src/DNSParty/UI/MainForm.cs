@@ -1038,6 +1038,14 @@ namespace DNSParty.UI
             _cardMenu.Show(screenLocation);
         }
 
+        private int GetCardHeight(DNSParty.Models.DnsProfile p)
+        {
+            int h = 68;
+            if (!string.IsNullOrWhiteSpace(p.Description)) h += 18;
+            if (!string.IsNullOrWhiteSpace(p.Warning)) h += 18;
+            return h;
+        }
+
         private void RecalculateLayout()
         {
             int w = ClientSize.Width;
@@ -1083,20 +1091,21 @@ namespace DNSParty.UI
                 int listTop = 132;
                 int listBottom = bottomY - 14;
                 int listHeight = Math.Max(100, listBottom - listTop);
-                int cardH = 68;
                 int cardGap = 10;
-                int totalContentH = visible.Count * (cardH + cardGap);
+                int totalContentH = 0;
+                foreach(var p in visible) totalContentH += GetCardHeight(p) + cardGap;
 
                 _maxProfileScroll = Math.Max(0, totalContentH - listHeight);
                 if (_profileScrollOffset > _maxProfileScroll) _profileScrollOffset = _maxProfileScroll;
                 if (_profileScrollOffset < 0) _profileScrollOffset = 0;
 
+                int currentY = listTop - _profileScrollOffset;
                 for (int i = 0; i < visible.Count; i++)
                 {
-                    int cy = listTop + i * (cardH + cardGap) - _profileScrollOffset;
-                    Rectangle cardRect = new Rectangle(centerLeft, cy, centerWidth, cardH);
-                    Rectangle starRect = new Rectangle(cardRect.Right - 82, cy + (cardH - 30) / 2, 30, 30);
-                    Rectangle moreRect = new Rectangle(cardRect.Right - 44, cy + (cardH - 30) / 2, 30, 30);
+                    int ch = GetCardHeight(visible[i]);
+                    Rectangle cardRect = new Rectangle(centerLeft, currentY, centerWidth, ch);
+                    Rectangle starRect = new Rectangle(cardRect.Right - 82, currentY + (ch - 30) / 2, 30, 30);
+                    Rectangle moreRect = new Rectangle(cardRect.Right - 44, currentY + (ch - 30) / 2, 30, 30);
 
                     _cardHitBoxes.Add(new CardHitBox
                     {
@@ -1105,6 +1114,7 @@ namespace DNSParty.UI
                         StarRect = starRect,
                         MoreRect = moreRect
                     });
+                    currentY += ch + cardGap;
                 }
             }
         }
@@ -1437,6 +1447,27 @@ namespace DNSParty.UI
                     float sepX = ipX + p1Size.Width + 10;
                     g.DrawLine(sepPen, sepX, ipY + 3, sepX, ipY + 15);
                     g.DrawString(p.SecondaryDns, ipFont, ipBrush, sepX + 12, ipY);
+                }
+            }
+
+            // Description & Warning
+            using (Font descFont = Theme.CreateFont(8.5f))
+            {
+                float currentY = r.Y + 56;
+                if (!string.IsNullOrWhiteSpace(p.Description))
+                {
+                    using (SolidBrush descBrush = new SolidBrush(Theme.TextSecondary))
+                    {
+                        g.DrawString(p.Description, descFont, descBrush, r.X + 66, currentY);
+                    }
+                    currentY += 18;
+                }
+                if (!string.IsNullOrWhiteSpace(p.Warning))
+                {
+                    using (SolidBrush warnBrush = new SolidBrush(Theme.StatusWarning))
+                    {
+                        g.DrawString("WARNING: " + p.Warning, descFont, warnBrush, r.X + 66, currentY);
+                    }
                 }
             }
 

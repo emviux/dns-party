@@ -825,9 +825,51 @@ namespace DNSParty.UI
                     DrawOpenDnsLogo(g, bounds);
                     break;
 
+                case "electro":
+                    DrawAbbreviationLogo(g, bounds, "EL", Color.FromArgb(34, 197, 94)); // #22c55e green
+                    break;
+                case "403online":
+                    DrawAbbreviationLogo(g, bounds, "403", Color.FromArgb(59, 130, 246)); // #3b82f6 blue
+                    break;
+                case "radargame":
+                    DrawAbbreviationLogo(g, bounds, "RG", Color.FromArgb(168, 85, 247)); // #a855f7 purple
+                    break;
+                case "shecan":
+                    DrawAbbreviationLogo(g, bounds, "SH", Color.FromArgb(6, 182, 212)); // #06b6d4 cyan
+                    break;
+                case "begzar":
+                    DrawAbbreviationLogo(g, bounds, "BG", Color.FromArgb(249, 115, 22)); // #f97316 orange
+                    break;
+                case "shatel":
+                    DrawAbbreviationLogo(g, bounds, "SHT", Color.FromArgb(234, 179, 8)); // #eab308 yellow
+                    break;
+
                 default:
                     DrawCustomDnsLogo(g, bounds);
                     break;
+            }
+        }
+
+        private static void DrawAbbreviationLogo(Graphics g, RectangleF bounds, string text, Color bgColor)
+        {
+            float r = Math.Max(2f, bounds.Width * 0.2f);
+            RectangleF box = MapRect(bounds, 2.5f, 2.5f, 19f, 19f);
+
+            using (SolidBrush bgBrush = new SolidBrush(bgColor))
+            {
+                Theme.FillRoundedRect(g, bgBrush, box, r);
+            }
+
+            float fontSize = bounds.Width * (text.Length > 2 ? 0.28f : 0.35f);
+            using (Font f = Theme.CreateBoldFont(fontSize))
+            using (SolidBrush textBrush = new SolidBrush(Color.White))
+            {
+                StringFormat sf = new StringFormat
+                {
+                    Alignment = StringAlignment.Center,
+                    LineAlignment = StringAlignment.Center
+                };
+                g.DrawString(text, f, textBrush, box, sf);
             }
         }
 

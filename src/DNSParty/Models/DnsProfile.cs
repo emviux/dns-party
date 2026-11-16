@@ -17,6 +17,8 @@ namespace DNSParty.Models
         public bool IsFavorite { get; set; }
         public bool IsDefaultProvider { get; set; }
         public string IconKey { get; set; }
+        public string Description { get; set; }
+        public string Warning { get; set; }
 
         public DnsProfile()
         {
@@ -29,6 +31,8 @@ namespace DNSParty.Models
             IsFavorite = false;
             IsDefaultProvider = false;
             IconKey = "custom";
+            Description = string.Empty;
+            Warning = string.Empty;
         }
 
         public DnsProfile Clone()
@@ -43,7 +47,9 @@ namespace DNSParty.Models
                 IsIPv6 = this.IsIPv6,
                 IsFavorite = this.IsFavorite,
                 IsDefaultProvider = this.IsDefaultProvider,
-                IconKey = this.IconKey
+                IconKey = this.IconKey,
+                Description = this.Description,
+                Warning = this.Warning
             };
         }
 
@@ -223,6 +229,87 @@ namespace DNSParty.Models
                     IsFavorite = false,
                     IsDefaultProvider = true,
                     IconKey = "opendns"
+                },
+                new DnsProfile
+                {
+                    Id = "electro",
+                    Name = "Electro",
+                    Tag = "Gaming",
+                    PrimaryDns = "78.157.42.100",
+                    SecondaryDns = "78.157.42.101",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "electro",
+                    Description = "Gaming-focused DNS for PC, PlayStation and Xbox."
+                },
+                new DnsProfile
+                {
+                    Id = "403online",
+                    Name = "403 Online",
+                    Tag = "Anti-Sanction",
+                    PrimaryDns = "10.202.10.202",
+                    SecondaryDns = "10.202.10.102",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "403online",
+                    Description = "DNS service supporting DoH and DoT.",
+                    Warning = "May require an Iranian ISP connection."
+                },
+                new DnsProfile
+                {
+                    Id = "radargame",
+                    Name = "Radar Game",
+                    Tag = "Gaming",
+                    PrimaryDns = "10.202.10.10",
+                    SecondaryDns = "10.202.10.11",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "radargame",
+                    Description = "Gaming-oriented DNS service.",
+                    Warning = "May require an Iranian ISP connection."
+                },
+                new DnsProfile
+                {
+                    Id = "shecan",
+                    Name = "Shecan",
+                    Tag = "Anti-Sanction",
+                    PrimaryDns = "178.22.122.100",
+                    SecondaryDns = "185.51.200.2",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "shecan",
+                    Description = "Free DNS service with DoH and DoT support."
+                },
+                new DnsProfile
+                {
+                    Id = "begzar",
+                    Name = "Begzar",
+                    Tag = "Gaming",
+                    PrimaryDns = "185.55.226.26",
+                    SecondaryDns = "185.55.225.25",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "begzar",
+                    Description = "Alternative DNS for game and launcher connectivity."
+                },
+                new DnsProfile
+                {
+                    Id = "shatel",
+                    Name = "Shatel",
+                    Tag = "ISP-Specific",
+                    PrimaryDns = "85.15.1.14",
+                    SecondaryDns = "85.15.1.15",
+                    IsIPv6 = false,
+                    IsFavorite = false,
+                    IsDefaultProvider = true,
+                    IconKey = "shatel",
+                    Description = "ISP-specific DNS, recommended for Shatel subscribers.",
+                    Warning = "Recommended for Shatel subscribers."
                 }
             };
         }

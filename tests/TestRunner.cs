@@ -77,7 +77,7 @@ namespace DNSParty.Tests
         {
             Console.WriteLine("\n1. Default DNS Profiles & IP Validation (IPv4 / IPv6)");
             var defaults = DnsProfile.GetDefaultProfiles();
-            Assert(defaults.Count == 5, "Prepopulated with 5 default DNS providers", "Count=" + defaults.Count);
+            Assert(defaults.Count == 11, "Prepopulated with 11 default DNS providers", "Count=" + defaults.Count);
 
             Assert(defaults[0].Name == "Cloudflare" && defaults[0].PrimaryDns == "1.1.1.1" && defaults[0].SecondaryDns == "1.0.0.1", "Cloudflare 1.1.1.1 / 1.0.0.1");
             Assert(defaults[1].Name == "Google" && defaults[1].PrimaryDns == "8.8.8.8" && defaults[1].SecondaryDns == "8.8.4.4", "Google 8.8.8.8 / 8.8.4.4");
@@ -113,7 +113,7 @@ namespace DNSParty.Tests
                 if (File.Exists(portableCfgPath)) File.Delete(portableCfgPath);
 
                 var cfg1 = new ConfigService();
-                Assert(cfg1.Profiles.Count == 5, "First launch initializes 5 default profiles");
+                Assert(cfg1.Profiles.Count == 11, "First launch initializes 11 default profiles");
 
                 // Add custom DNS profile & mark as favorite
                 var custom = new DnsProfile
@@ -132,7 +132,7 @@ namespace DNSParty.Tests
 
                 // Reload in new instance
                 var cfg2 = new ConfigService();
-                Assert(cfg2.Profiles.Count == 6, "Custom profile persisted across restart", "Count=" + cfg2.Profiles.Count);
+                Assert(cfg2.Profiles.Count == 12, "Custom profile persisted across restart", "Count=" + cfg2.Profiles.Count);
                 var reloadedCustom = cfg2.Profiles.FirstOrDefault(p => p.Id == "custom_test_1");
                 Assert(reloadedCustom != null && reloadedCustom.IsFavorite && reloadedCustom.Name == "My Gaming DNS", "Favorite & custom fields persisted");
                 Assert(cfg2.Settings.ConfirmBeforeDisable && !cfg2.Settings.EnableSounds, "Settings flags persisted");
@@ -146,13 +146,13 @@ namespace DNSParty.Tests
                 cfg3.Profiles.RemoveAll(p => p.Id == "custom_test_1");
                 cfg3.Save();
                 var cfg4 = new ConfigService();
-                Assert(cfg4.Profiles.Count == 5, "Profile deletion persisted");
+                Assert(cfg4.Profiles.Count == 11, "Profile deletion persisted");
 
                 // Corrupt the JSON file intentionally
                 File.WriteAllText(portableCfgPath, "{ invalid corrupted json !!! [[[");
                 var cfgCorrupt = new ConfigService();
                 Assert(cfgCorrupt.RecoveredFromCorruption, "Corrupted config file detected and recovered gracefully");
-                Assert(cfgCorrupt.Profiles.Count == 5, "Defaults restored after corruption recovery");
+                Assert(cfgCorrupt.Profiles.Count == 11, "Defaults restored after corruption recovery");
             }
             finally
             {
