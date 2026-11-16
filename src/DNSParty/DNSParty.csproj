@@ -49,6 +49,7 @@
     <Compile Include="Models\DnsStatusSnapshot.cs" />
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\DnsService.cs" />
+    <Compile Include="Services\HotkeyService.cs" />
     <Compile Include="Services\SoundService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="VersionInfo.cs" />

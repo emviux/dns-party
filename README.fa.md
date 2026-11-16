@@ -1,104 +1,116 @@
 <div dir="rtl">
 
-# برنامه DNS Party — مدیریت DNS ویندوز
+# برنامه DNS Party — مدیریت حرفه‌ای DNS ویندوز
 
-[🇺🇸 English](README.md)
+[![English Description](https://img.shields.io/badge/%F0%9F%87%BA%F0%9F%87%B8_English-English_Description-0969da?style=for-the-badge)](README.md)
+[![Latest Release](https://img.shields.io/github/v/release/emviux/dns-party?style=for-the-badge&label=Download&color=7c3aed)](https://github.com/emviux/dns-party/releases/latest)
 
-**DNS Party** یک ابزار بومی، سریع، سبک و با الهام از محیط گیمینگ برای ویندوز است که برای مدیریت، تست و جابجایی بین تنظیمات سرور DNS نسخه IPv4 و IPv6 تنها با یک کلیک از طریق System Tray (نوار وظیفه) طراحی شده است.
+**DNS Party** یک ابزار بومی، سریع، سبک و با الهام از محیط گیمینگ برای دسکتاپ ویندوز است که مدیریت، تست پینگ و جابجایی بین تنظیمات سرورهای DNS نسخه IPv4 و IPv6 را تنها با یک کلیک از طریق **System Tray** (نوار وظیفه) و **منوی درون‌بازی (In-Game Overlay)** فراهم می‌کند.
+
+---
+
+## دانلود و روش‌های استفاده (۳ روش)
+
+شما می‌توانید به هر یک از **۳ روش** زیر برنامه **DNS Party** را دریافت و استفاده کنید:
+
+### ۱. نصب از طریق جادوگر نصب — Install Wizard (پیشنهادی)
+1. فایل **[`DNSParty-Setup.exe`](https://github.com/emviux/dns-party/raw/main/dist/DNSParty-Setup.exe)** را دانلود کنید (همچنین در بخش [**GitHub Releases**](https://github.com/emviux/dns-party/releases/latest) در دسترس است).
+2. فایل نصبی را اجرا کنید، مسیر دلخواه خود را انتخاب نمایید (برنامه به طور خودکار پوشه `DNS Party` را در مسیر انتخابی می‌سازد) و مراحل نصب را تکمیل کنید.
+3. میانبرهای دسکتاپ و منوی استارت را ایجاد می‌کند، تنظیمات شما را در مسیر `%LocalAppData%\DNSParty` در زمان آپدیت حفظ می‌کند و فایل حذف‌کننده اختصاصی (`Unins000.exe`) را در بخش **Installed Apps** و **Control Panel** ویندوز ثبت می‌نماید.
+   - *پشتیبانی از نصب بی‌صدا (Silent):* `DNSParty-Setup.exe /S`
+
+### ۲. نسخه پرتابل — Portable (بدون نیاز به نصب)
+1. فایل **[`DNSParty-Portable.exe`](https://github.com/emviux/dns-party/raw/main/dist/DNSParty-Portable.exe)** را دانلود کنید (همچنین در بخش [**GitHub Releases**](https://github.com/emviux/dns-party/releases/latest) در دسترس است).
+2. فایل `DNSParty-Portable.exe` را مستقیماً از هر پوشه‌ای اجرا کنید — بدون نیاز به هیچ‌گونه نصب.
+3. *حالت فلش مموری / کاملاً پرتابل (اختیاری):* اگر یک فایل خالی با نام `portable.flag` در کنار فایل `DNSParty-Portable.exe` بسازید، تمام تنظیمات و پروفایل‌های سفارشی DNS مستقیماً در کنار فایل اجرایی در `portable_config.json` ذخیره می‌شوند.
+
+### ۳. ساخت از سورس کد با `build.bat` (مخصوص کاربران فنی و توسعه‌دهندگان)
+اگر تمایل دارید سورس کد را بررسی کرده و خودتان برنامه را از صفر کامپایل کنید:
+1. اطمینان حاصل کنید که روی **ویندوز ۱۰ یا ویندوز ۱۱** هستید و **Visual Studio** (یا **Visual Studio Build Tools** با پشتیبانی از C# / MSBuild) روی سیستم نصب است.
+2. مخزن را کلون کرده و اسکریپت `build.bat` را اجرا کنید:
+
+<div dir="ltr">
+
+```bat
+git clone https://github.com/emviux/dns-party.git
+cd dns-party
+.\build.bat
+```
+
+</div>
+
+3. اسکریپت `build.bat` به صورت خودکار کامپایلر Roslyn C# (`csc.exe`) را پیدا کرده، برنامه اصلی، حذف‌کننده اختصاصی (`Unins000.exe`) و جادوگر نصب را در پوشه `dist\DNSParty-Portable.exe` و `dist\DNSParty-Setup.exe` کامپایل می‌کند و تست‌های کنترل کیفیت خودکار را اجرا می‌نماید.
 
 ---
 
 ## ویژگی‌های کلیدی
 
-- **تغییر DNS با یک کلیک**: جابجایی سریع بین **Cloudflare** (`1.1.1.1`)، **Google DNS** (`8.8.8.8`)، **Quad9** (`9.9.9.9`)، **AdGuard DNS** (`94.140.14.14`)، **OpenDNS** (`208.67.222.222`)، و پروفایل‌های نامحدود اختصاصی IPv4/IPv6.
-- **بررسی وضعیت واقعی ویندوز**: وضعیت واقعی آداپتور شبکه ویندوز (`NetworkInterface` + `HKLM\SYSTEM\CurrentControlSet\Services\Tcpip(6)\Parameters\Interfaces\{GUID}`) را می‌خواند تا تفاوت بین DNS درخواستی و فعال را تشخیص دهد و هرگز وضعیت اتصال اشتباهی را نمایش ندهد.
-- **همپوشانی (Overlay) درون بازی**: منوی همپوشانی شفاف و بدون حاشیه برای تغییر سریع DNS، قابل دسترس از طریق میانبر صفحه کلید سراسری (پیش‌فرض `Shift+Tab`، قابل تغییر). بدون نیاز به خروج از بازی، DNS خود را تغییر دهید. بدون تداخل با استیم (Steam).
-- **غیرفعال کردن DNS (بازگشت به DHCP خودکار)**: آداپتور فعال شبکه (اترنت یا وای‌فای) را به حالت دریافت خودکار DNS ویندوز (`netsh interface ipv4/ipv6 set dnsservers ... source=dhcp`) برمی‌گرداند و موفقیت آن را بررسی می‌کند.
-- **پاکسازی کش DNS (Flush DNS)**: دستور `ipconfig /flushdns` را در پس‌زمینه و بدون باز کردن پنجره خط فرمان اجرا کرده و نتیجه را اعلام می‌کند.
-- **تست تأخیر DNS از طریق پورت UDP 53**: زمان واقعی پاسخگویی سرورهای DNS را بر حسب میلی‌ثانیه (`ms`) با استفاده از درخواست‌های UDP DNS بر اساس پروتکل RFC 1035 اندازه‌گیری می‌کند.
-- **جابجایی سریع در System Tray**:
-  - به شکل تمیز در System Tray ویندوز کمینه/بسته می‌شود.
-  - خود را از `Alt+Tab` پنهان می‌کند (`WS_EX_TOOLWINDOW`) و در حالت پنهان در پس‌زمینه، ۰٪ از پردازنده را اشغال می‌کند.
-  - منوی کلیک راست امکاناتی نظیر جابجایی سریع، نشانگر تیک برای DNS فعال، زیرمنوی **علاقه‌مندی‌های کاربر** (User Favorites)، **غیرفعال کردن DNS**، **پاکسازی کش DNS**، **تنظیمات** (Settings) و **خروج** (Exit) را فراهم می‌کند.
-  - کلیک چپ روی آیکون Tray، پنجره اصلی برنامه را بازگردانی می‌کند.
-- **افکت‌های صوتی ظریف هنگام اتصال**: در صورت موفقیت‌آمیز بودن تغییر DNS، افکت‌های صوتی کوتاه با فرمت PCM `.wav` (`connect.wav` / `disconnect.wav`) پخش می‌کند (قابل تغییر در تنظیمات).
-- **امتیازات هوشمند UAC (دسترسی ادمین)**: رابط کاربری (UI) عادی را به عنوان کاربر استاندارد (`asInvoker`) اجرا می‌کند، بنابراین برای راه‌اندازی و گشت‌وگذار نیازی به تأیید UAC (ادمین) نیست؛ تنها در زمان تغییر تنظیمات DNS آداپتور ویندوز به‌صورت یکپارچه و موقت درخواست دسترسی بالا (`--elevated-apply` / `--elevated-dhcp` از طریق `runas`) می‌کند.
+- **تغییر DNS با یک کلیک**: جابجایی آنی بین **Cloudflare** (`1.1.1.1`)، **Google DNS** (`8.8.8.8`)، **Quad9** (`9.9.9.9`)، **AdGuard DNS** (`94.140.14.14`)، **OpenDNS** (`208.67.222.222`) و بی‌نهایت پروفایل اختصاصی IPv4 و IPv6.
+- **بررسی وضعیت واقعی شبکه ویندوز**: وضعیت واقعی آداپتور شبکه ویندوز (`NetworkInterface` و رجیستری `Tcpip(6)`) را می‌خواند تا تفاوت بین DNS درخواستی و DNS فعال واقعی را تشخیص دهد و هرگز وضعیت اتصال کاذب نمایش ندهد.
+- **منوی همپوشانی درون بازی (In-Game Overlay)**: پنجره شفاف و بدون حاشیه برای تغییر سریع DNS با کلید میانبر سراسری (پیش‌فرض `Shift+Tab` و قابل تغییر در تنظیمات) بدون نیاز به خروج از محیط بازی.
+- **غیرفعال‌سازی DNS (بازگشت به DHCP خودکار)**: آداپتور فعال وای‌فای یا اترنت را به حالت دریافت خودکار DNS ویندوز (`source=dhcp`) بازمی‌گرداند و صحت بازگشت را تأیید می‌کند.
+- **پاکسازی کش DNS (Flush DNS Cache)**: دستور `ipconfig /flushdns` را کاملاً مخفی و بدون باز شدن پنجره سیاه CMD اجرا کرده و نتیجه را نمایش می‌دهد.
+- **تست دقیق پینگ و تأخیر DNS از طریق پورت UDP 53**: زمان پاسخگویی واقعی سرورهای DNS را بر حسب میلی‌ثانیه (`ms`) با ارسال بسته استاندارد RFC 1035 اندازه‌گیری می‌کند.
+- **اجرا در پس‌زمینه و System Tray**:
+  - هنگام بستن پنجره از شما می‌پرسد که آیا برنامه در پس‌زمینه فعال بماند یا کاملاً بسته شود (با قابلیت به خاطر سپردن انتخاب شما).
+  - در حالت مخفی در System Tray، از منوی `Alt+Tab` پنهان می‌شود (`WS_EX_TOOLWINDOW`) و مصرف پردازنده (CPU) در حالت بیکار نزدیک به ۰٪ است.
+  - منوی کلیک راست روی آیکون Tray امکان تغییر فوری DNS، مشاهده تیک DNS فعال، زیرمنوی **علاقه‌مندی‌ها (Favorites)**، **غیرفعال کردن DNS**، **پاکسازی کش DNS**، **تنظیمات** و **خروج** را فراهم می‌کند.
+- **به‌روزرسانی خودکار و نمایش تغییرات نسخه جدید**: انتشار نسخه‌های جدید در GitHub Releases را بررسی کرده و پس از نصب آپدیت، فهرست امکانات جدید و باگ‌های برطرف‌شده را نمایش می‌دهد.
+- **افکت‌های صوتی ظریف هنگام اتصال**: هنگام تغییر موفق DNS، افکت صوتی کوتاه `.wav` (`connect.wav` / `disconnect.wav`) پخش می‌کند (قابل فعال/غیرفعال‌سازی در تنظیمات).
+- **مدیریت هوشمند دسترسی ادمین (UAC)**: رابط کاربری برنامه با سطح دسترسی کاربر عادی (`asInvoker`) اجرا می‌شود تا هنگام باز کردن برنامه نیازی به تأیید UAC نباشد؛ و فقط در لحظه اعمال تغییر DNS روی کارت شبکه به صورت هوشمند دسترسی ادمین درخواست می‌کند.
 
 ---
 
 ## ساختار پروژه
 
+<div dir="ltr">
+
 ```text
 DNS Party/
-├── ARCHITECTURE.md                  # معماری، بنچمارک‌های پشته نرم‌افزاری و تصمیمات طراحی
-├── README.md                        # مستندات، دستورالعمل‌های بیلد و استفاده
-├── build.bat                        # اسکریپت ساخت (بیلد) با یک کلیک و تست کنترل کیفیت
-├── assets/
-│   ├── icon_pack/                   # بسته آیکون‌های SVG برنامه
-│   ├── logo_assets/                 # لوگوهای PNG در اندازه‌های مختلف و dns-party.ico
-│   └── sounds/                      # فایل‌های صوتی محلی (connect.wav, disconnect.wav)
+├── ARCHITECTURE.md                  # Architecture, stack benchmarks & design decisions
+├── README.md                        # English documentation & installation guide
+├── README.fa.md                     # Persian (RTL) documentation & installation guide
+├── build.bat                        # 1-click source build & automated QA test script
+├── assets/                          # Application icons, branding & tray icon pack
 ├── src/
 │   ├── DNSParty/
-│   │   ├── DNSParty.csproj          # فایل پروژه MSBuild (تحت دات‌نت فریم‌ورک ۴.۸)
-│   │   ├── app.manifest             # مانیفست PerMonitorV2 DPI و UAC
-│   │   ├── Program.cs               # نقطه ورود (Entry point) برنامه و مدیریت ارتقای دسترسی خط فرمان
+│   │   ├── DNSParty.csproj          # MSBuild project file (.NET Framework 4.8)
+│   │   ├── app.manifest             # PerMonitorV2 DPI & UAC manifest
+│   │   ├── Program.cs               # Single-instance entry point & CLI elevation helper
+│   │   ├── VersionInfo.cs           # Application version & repository metadata
 │   │   ├── Models/
-│   │   │   ├── DnsProfile.cs        # مدل پروفایل DNS، پیش‌فرض‌ها و اعتبارسنجی دقیق IPv4/IPv6
-│   │   │   ├── AppSettings.cs       # تنظیمات کاربر و مدل ذخیره‌سازی پروفایل‌ها
-│   │   │   └── DnsStatusSnapshot.cs # وضعیت زنده DNS آداپتور شبکه ویندوز
+│   │   │   ├── DnsProfile.cs        # DNS profile model, defaults & strict IPv4/IPv6 validation
+│   │   │   ├── AppSettings.cs       # User settings & profile persistence model
+│   │   │   └── DnsStatusSnapshot.cs # Live Windows network adapter DNS state snapshot
 │   │   ├── Services/
-│   │   │   ├── ConfigService.cs     # ذخیره‌سازی امن JSON و بازیابی در صورت خرابی داده‌ها
-│   │   │   ├── DnsService.cs        # تشخیص آداپتور، تغییر/حذف DNS، پاکسازی کش و تست UDP
-│   │   │   └── SoundService.cs      # تولیدکننده و پخش‌کننده صوتی فایل‌های WAV
+│   │   │   ├── ConfigService.cs     # Atomic JSON persistence & corruption recovery
+│   │   │   ├── DnsService.cs        # Adapter detection, netsh DNS apply/DHCP, flush & UDP test
+│   │   │   ├── HotkeyService.cs     # Global hotkey registration for In-Game Overlay
+│   │   │   ├── SoundService.cs      # Local WAV generator & non-blocking audio player
+│   │   │   └── UpdateService.cs     # GitHub Releases update checker & installer launcher
 │   │   └── UI/
-│   │       ├── Theme.cs             # تم تاریک گیمینگ، پالت تم روشن و ابزارهای GDI+
-│   │       ├── IconRenderer.cs      # رندر آیکون‌های وکتور و لوگوی ارائه‌دهندگان
-│   │       ├── TrayMenuRenderer.cs  # رندر منوی سفارشی تاریک برای System Tray
-│   │       ├── AddEditDnsDialog.cs  # دیالوگ برای افزودن/ویرایش پروفایل‌های DNS
-│   │       └── MainForm.cs          # داشبورد اصلی، تنظیمات، درباره ما و کنترلر System Tray
+│   │       ├── Theme.cs             # Dark gaming navy/purple & Light theme palette + GDI+ helpers
+│   │       ├── IconRenderer.cs      # Vector icon & provider logo renderer + multi-DPI tray icons
+│   │       ├── TrayMenuRenderer.cs  # Custom dark context menu renderer for System Tray
+│   │       ├── AddEditDnsDialog.cs  # Modal dialog for adding/editing IPv4 & IPv6 DNS profiles
+│   │       ├── OverlayForm.cs       # Borderless In-Game DNS switching overlay
+│   │       └── MainForm.cs          # Main dashboard, Favorites, Settings, About & Tray controller
 │   └── Installer/
-│       └── InstallerProgram.cs      # برنامه نصب/حذف مستقل با رابط کاربری و حالت بی‌صدا (Silent)
+│       ├── InstallerProgram.cs      # Interactive GUI & silent Windows Setup Wizard
+│       └── UninstallerProgram.cs    # Dedicated Windows Uninstaller (Unins000.exe)
 ├── tests/
-│   └── TestRunner.cs                # مجموعه ۴۱ تست خودکار برای کنترل کیفیت و تأیید عملکرد
-├── build/
-│   ├── DNSParty.exe                 # فایل اجرایی کامپایل‌شده اصلی
-│   ├── DNSPartyTests.exe            # اجرای تست کامپایل‌شده
-│   └── dashboard_preview.png        # تصویر رندر شده از داشبورد
+│   └── TestRunner.cs                # Automated QA & verification suite
 └── dist/
-    ├── DNSParty-Portable.exe        # نسخه اجرایی مستقل پرتابل (~۳۴۳ کیلوبایت)
-    ├── DNSParty-Portable/           # توزیع نسخه پرتابل به شکل پوشه (همراه با portable.flag)
-    ├── DNSParty-Portable-v1.0.0.zip # بسته فشرده نسخه پرتابل
-    └── DNSParty-Setup.exe           # نصب‌کننده (Installer) مستقل ویندوز
+    ├── DNSParty-Setup.exe           # Method 1: Standalone Windows Install Wizard
+    └── DNSParty-Portable.exe        # Method 2: Standalone Single-File Portable Executable
 ```
+
+</div>
 
 ---
 
-## نصب و استفاده
+## مجوز انتشار (License)
 
-### گزینه ۱: نسخه پرتابل (بدون نیاز به نصب)
-1. فایل `dist/DNSParty-Portable.exe` را مستقیماً اجرا کنید، یا فایل فشرده `dist/DNSParty-Portable-v1.0.0.zip` را در هر مکانی روی کامپیوتر خود استخراج نمایید.
-2. وقتی فایل `portable.flag` در کنار فایل `DNSParty.exe` (مانند پوشه `dist/DNSParty-Portable/`) وجود داشته باشد، تمامی تنظیمات و پروفایل‌های سفارشی شما مستقیماً در کنار فایل اجرایی در فایل `portable_config.json` ذخیره می‌شوند.
-
-### گزینه ۲: نسخه نصبی (Installer)
-1. فایل `dist/DNSParty-Setup.exe` را اجرا کنید (پشتیبانی از نصب رابط کاربری یا نصب خودکار/بی‌صدا با سویچ `DNSParty-Setup.exe /S`).
-2. برنامه DNS Party را در مسیر `%LocalAppData%\Programs\DNSParty` نصب می‌کند، میانبرهایی روی دسکتاپ و منوی استارت ایجاد کرده، و امکان حذف نرم‌افزار (Uninstall) را در بخش Installed Apps ویندوز فراهم می‌کند (از طریق `DNSParty-Setup.exe /U`).
-
----
-
-## ساخت برنامه از سورس کد (Building)
-
-### پیش‌نیازها
-- ویندوز ۱۰ یا ویندوز ۱۱ (.NET Framework 4.8 به صورت پیش‌فرض روی ویندوز نصب است).
-- برنامه MSBuild یا `csc.exe` (همراه با Visual Studio یا Build Tools یا خود سیستم `.NET Framework` ارائه می‌شود).
-
-### دستورات ساخت (Build)
-فایل `build.bat` را از پوشه اصلی پروژه اجرا کنید:
-```bat
-.\build.bat
-```
-یا با استفاده مستقیم از MSBuild آن را کامپایل کنید:
-```powershell
-& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "src\DNSParty\DNSParty.csproj" /p:Configuration=Release
-```
+این پروژه تحت مجوز [MIT License](LICENSE) منتشر شده است.
 
 </div>

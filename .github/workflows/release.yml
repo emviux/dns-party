@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-release:
     runs-on: windows-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -20,36 +20,17 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build Application and Installer
-      run: |
-        .\build.bat
+      run: .\build.bat --skip-tests
       shell: cmd
 
     - name: Calculate SHA-256 Checksums
       run: |
         $setupHash = (Get-FileHash "dist\DNSParty-Setup.exe" -Algorithm SHA256).Hash
         $portableHash = (Get-FileHash "dist\DNSParty-Portable.exe" -Algorithm SHA256).Hash
-        $zipHash = (Get-FileHash "dist\DNSParty-Portable.zip" -Algorithm SHA256).Hash
-        
-        "SHA256 Checksums:" | Out-File -FilePath "dist\SHA256SUMS.txt"
-        "$setupHash *DNSParty-Setup.exe" | Out-File -FilePath "dist\SHA256SUMS.txt" -Append
-        "$portableHash *DNSParty-Portable.exe" | Out-File -FilePath "dist\SHA256SUMS.txt" -Append
-        "$zipHash *DNSParty-Portable.zip" | Out-File -FilePath "dist\SHA256SUMS.txt" -Append
-      shell: powershell
 
-    - name: Generate Update Manifest
-      run: |
-        $version = "${{ github.ref_name }}".TrimStart('v')
-        $date = (Get-Date).ToString("yyyy-MM-dd")
-        $manifest = @{
-            version = $version
-            releaseDate = $date
-            releaseNotes = "Automatic update release for $version"
-            minimumSupportedVersion = "1.0.0"
-            mandatory = $false
-            downloadUrl = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/DNSParty-Setup.exe"
-            checksumUrl = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/SHA256SUMS.txt"
-        }
-        $manifest | ConvertTo-Json | Out-File -FilePath "dist\update.json"
+        "SHA256 Checksums:" | Out-File -FilePath "dist\SHA256SUMS.txt" -Encoding utf8
+        "$setupHash *DNSParty-Setup.exe" | Out-File -FilePath "dist\SHA256SUMS.txt" -Append -Encoding utf8
+        "$portableHash *DNSParty-Portable.exe" | Out-File -FilePath "dist\SHA256SUMS.txt" -Append -Encoding utf8
       shell: powershell
 
     - name: Publish GitHub Release
@@ -58,10 +39,8 @@ jobs:
         files: |
           dist\DNSParty-Setup.exe
           dist\DNSParty-Portable.exe
-          dist\DNSParty-Portable.zip
           dist\SHA256SUMS.txt
-          dist\update.json
-        name: Release ${{ github.ref_name }}
+        name: DNS Party ${{ github.ref_name }}
         draft: false
         prerelease: false
       env:

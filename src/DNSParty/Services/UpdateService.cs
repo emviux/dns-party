@@ -89,6 +89,7 @@ namespace DNSParty.Services
 
                     if (data.TryGetValue("assets", out var assetsObj) && assetsObj is IEnumerable assets)
                     {
+                        string fallbackExeUrl = null;
                         foreach (var item in assets)
                         {
                             if (item is Dictionary<string, object> asset)
@@ -98,11 +99,22 @@ namespace DNSParty.Services
                                     string downloadUrl = urlObj.ToString();
                                     if (downloadUrl.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        _downloadUrl = downloadUrl;
-                                        break;
+                                        if (downloadUrl.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
+                                        {
+                                            _downloadUrl = downloadUrl;
+                                            break;
+                                        }
+                                        if (fallbackExeUrl == null)
+                                        {
+                                            fallbackExeUrl = downloadUrl;
+                                        }
                                     }
                                 }
                             }
+                        }
+                        if (string.IsNullOrEmpty(_downloadUrl))
+                        {
+                            _downloadUrl = fallbackExeUrl;
                         }
                     }
                 }

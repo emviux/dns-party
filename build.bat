@@ -1,13 +1,19 @@
 @echo off
 setlocal
 echo ============================================================
-echo  Building DNS Party v1.0.0 (Release, Portable, Installer)
+echo  Building DNS Party v1.1.0 (Portable + Setup Installer)
 echo ============================================================
 
-set "CSC=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not exist "%CSC%" (
-    set "CSC=C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
-)
+set "CSC="
+set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+if not exist "%VSWHERE%" goto :fallback_csc
+for /f "usebackq delims=" %%i in (`"%VSWHERE%" -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\Roslyn\csc.exe -latest`) do set "CSC=%%i"
+
+:fallback_csc
+if not defined CSC if exist "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe" set "CSC=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined CSC set "CSC=C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+
+echo Using compiler: "%CSC%"
 
 if not exist "build" mkdir "build"
 if not exist "dist" mkdir "dist"
@@ -38,13 +44,16 @@ echo [1/3] Compiling DNSParty.exe...
     "src\DNSParty\VersionInfo.cs" "src\DNSParty\Models\*.cs" "src\DNSParty\Services\*.cs" "src\DNSParty\UI\*.cs" "src\DNSParty\Program.cs"
 
 if errorlevel 1 (
-    echo [ERROR] Compilation failed.
+    echo [ERROR] DNSParty.exe compilation failed.
     exit /b 1
 )
 
-echo [2/3] Copying Portable executable, compiling Uninstaller, and building Installer...
+echo [2/3] Creating Portable executable, Uninstaller, and Setup Wizard...
 copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable.exe" >nul
-copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable\DNSParty.exe" >nul
+if errorlevel 1 (
+    echo [ERROR] Could not copy dist\DNSParty-Portable.exe ^(make sure it is not currently running^).
+    exit /b 1
+)
 
 "%CSC%" /nologo /target:winexe /optimize+ /out:"build\Unins000.exe" ^
     /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
@@ -52,8 +61,12 @@ copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable\DNSParty.exe" >nul
     /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll ^
     "src\Installer\UninstallerProgram.cs"
 
-powershell -Command "if (Test-Path 'build\Payload.zip') { Remove-Item 'build\Payload.zip' }; Compress-Archive -Path 'build\DNSParty.exe', 'build\Unins000.exe' -DestinationPath 'build\Payload.zip' -Force"
-powershell -Command "if (Test-Path 'dist\DNSParty-Portable.zip') { Remove-Item 'dist\DNSParty-Portable.zip' }; Compress-Archive -Path 'dist\DNSParty-Portable\*' -DestinationPath 'dist\DNSParty-Portable.zip' -Force"
+if errorlevel 1 (
+    echo [ERROR] Uninstaller compilation failed.
+    exit /b 1
+)
+
+powershell -NoProfile -Command "if (Test-Path 'build\Payload.zip') { Remove-Item 'build\Payload.zip' -Force }; Compress-Archive -Path 'build\DNSParty.exe', 'build\Unins000.exe' -DestinationPath 'build\Payload.zip' -Force"
 
 "%CSC%" /nologo /target:winexe /optimize+ /out:"dist\DNSParty-Setup.exe" ^
     /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
@@ -65,16 +78,30 @@ powershell -Command "if (Test-Path 'dist\DNSParty-Portable.zip') { Remove-Item '
     /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll ^
     "src\Installer\InstallerProgram.cs" "src\DNSParty\VersionInfo.cs"
 
+if errorlevel 1 (
+    echo [ERROR] Setup Wizard compilation failed.
+    exit /b 1
+)
+
+if /I "%~1"=="--skip-tests" goto :done
+
 echo [3/3] Running Automated QA Verification Suite...
 "%CSC%" /nologo /target:exe /optimize+ /out:"build\DNSPartyTests.exe" ^
     /r:"build\DNSParty.exe" /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll ^
     "tests\TestRunner.cs"
+if errorlevel 1 (
+    echo [ERROR] TestRunner compilation failed.
+    exit /b 1
+)
 "build\DNSPartyTests.exe"
+if errorlevel 1 (
+    echo [ERROR] Automated QA tests failed.
+    exit /b 1
+)
 
+:done
 echo ============================================================
 echo  Build Complete:
-echo   - build\DNSParty.exe
-echo   - dist\DNSParty-Portable.exe
-echo   - dist\DNSParty-Portable.zip
-echo   - dist\DNSParty-Setup.exe
+echo   - dist\DNSParty-Setup.exe     (Install Wizard)
+echo   - dist\DNSParty-Portable.exe  (Portable Executable)
 echo ============================================================

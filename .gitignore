@@ -9,9 +9,11 @@ TestResults/
 .vs/
 *.pdb
 
-# Build output
+# Build output (keep only official Portable & Setup Wizard in dist/)
 build/
-dist/
+dist/*
+!dist/DNSParty-Setup.exe
+!dist/DNSParty-Portable.exe
 
 # Logs
 *.log
@@ -19,3 +21,13 @@ dist/
 # Portable config
 portable.flag
 portable_config.json
+
+# Local scratch / internal notes
+modify.py
+test.cs
+ui.png
+Transparent DNS Party Overlay.png
+DNS-Party-Logo-Pack-New.zip
+DNS_Party_Logo_Assets.zip
+dns_party_icon_pack.zip
+PHASE_*.md

@@ -17,11 +17,14 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Build Application
-      run: msbuild src/DNSParty/DNSParty.csproj /p:Configuration=Release
+    - name: Build Application and Installer
+      run: .\build.bat --skip-tests
+      shell: cmd
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: DNSParty-Release
-        path: src/DNSParty/obj/Release/DNSParty.exe
+        name: DNSParty-Distribution
+        path: |
+          dist/DNSParty-Setup.exe
+          dist/DNSParty-Portable.exe
