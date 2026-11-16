@@ -37,9 +37,9 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          dist\DNSParty-Setup.exe
-          dist\DNSParty-Portable.exe
-          dist\SHA256SUMS.txt
+          dist/DNSParty-Setup.exe
+          dist/DNSParty-Portable.exe
+          dist/SHA256SUMS.txt
         name: DNS Party ${{ github.ref_name }}
         draft: false
         prerelease: false
