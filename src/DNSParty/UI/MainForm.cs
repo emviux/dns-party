@@ -193,6 +193,34 @@ namespace DNSParty.UI
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+
+            if (!string.Equals(_configService.Settings.LastRunVersion, VersionInfo.CurrentVersion))
+            {
+                bool isNewInstall = string.IsNullOrEmpty(_configService.Settings.LastRunVersion);
+                string message = $"DNS Party has been updated to v{VersionInfo.CurrentVersion}!\n\n" +
+                                 "New in this version / Bugs repaired:\n" +
+                                 "- Completely redesigned 'Add Custom DNS' layout, fixing overlapping UI elements.\n" +
+                                 "- Introduced a dedicated, authentic Windows Uninstaller (Unins000.exe).\n" +
+                                 "- Improved the Setup Wizard with an interactive 5-step process.\n" +
+                                 "- Automatically selects a dedicated folder when browsing in Setup.\n" +
+                                 "- Background tray prompt added when closing the app.";
+
+                if (isNewInstall)
+                {
+                    message = $"Welcome to DNS Party v{VersionInfo.CurrentVersion}!\n\n" +
+                              "Recent features & bugs repaired:\n" +
+                              "- Completely redesigned 'Add Custom DNS' layout, fixing overlapping UI elements.\n" +
+                              "- Introduced a dedicated, authentic Windows Uninstaller.\n" +
+                              "- Setup Wizard improvements and automatic folder creation.\n" +
+                              "- Keep-in-background prompt added upon exit.";
+                }
+
+                MessageBox.Show(this, message, "DNS Party Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                _configService.Settings.LastRunVersion = VersionInfo.CurrentVersion;
+                _configService.Save();
+            }
+
             if (_startMinimized)
             {
                 HideToTray(false);
@@ -545,12 +573,34 @@ namespace DNSParty.UI
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!_isExitingApplication &&
-                e.CloseReason == CloseReason.UserClosing &&
-                _configService.Settings.CloseMinimizesToTray)
+                e.CloseReason == CloseReason.UserClosing)
             {
-                e.Cancel = true;
-                HideToTray(false);
-                return;
+                if (!_configService.Settings.HasPromptedBackgroundBehavior)
+                {
+                    var res = MessageBox.Show(this,
+                        "Do you want DNS Party to keep running in the background (system tray) so you can quickly switch DNS profiles?\n\nSelecting 'No' will fully exit the application.",
+                        "Run in Background",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Question);
+
+                    if (res == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
+                    _configService.Settings.CloseMinimizesToTray = (res == DialogResult.Yes);
+                    _configService.Settings.MinimizeToTray = (res == DialogResult.Yes);
+                    _configService.Settings.HasPromptedBackgroundBehavior = true;
+                    _configService.Save();
+                }
+
+                if (_configService.Settings.CloseMinimizesToTray)
+                {
+                    e.Cancel = true;
+                    HideToTray(false);
+                    return;
+                }
             }
 
             if (_hotkeyService != null)

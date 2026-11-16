@@ -42,11 +42,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [2/3] Copying Portable executable and building Installer...
+echo [2/3] Copying Portable executable, compiling Uninstaller, and building Installer...
 copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable.exe" >nul
 copy /Y "build\DNSParty.exe" "dist\DNSParty-Portable\DNSParty.exe" >nul
 
-powershell -Command "if (Test-Path 'build\Payload.zip') { Remove-Item 'build\Payload.zip' }; Compress-Archive -Path 'build\DNSParty.exe' -DestinationPath 'build\Payload.zip' -Force"
+"%CSC%" /nologo /target:winexe /optimize+ /out:"build\Unins000.exe" ^
+    /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
+    /win32manifest:"src\DNSParty\app.manifest" ^
+    /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll ^
+    "src\Installer\UninstallerProgram.cs"
+
+powershell -Command "if (Test-Path 'build\Payload.zip') { Remove-Item 'build\Payload.zip' }; Compress-Archive -Path 'build\DNSParty.exe', 'build\Unins000.exe' -DestinationPath 'build\Payload.zip' -Force"
 powershell -Command "if (Test-Path 'dist\DNSParty-Portable.zip') { Remove-Item 'dist\DNSParty-Portable.zip' }; Compress-Archive -Path 'dist\DNSParty-Portable\*' -DestinationPath 'dist\DNSParty-Portable.zip' -Force"
 
 "%CSC%" /nologo /target:winexe /optimize+ /out:"dist\DNSParty-Setup.exe" ^
@@ -55,6 +61,7 @@ powershell -Command "if (Test-Path 'dist\DNSParty-Portable.zip') { Remove-Item '
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico",DNSParty.app.ico ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png",DNSParty.installer-logo-512.png ^
     /resource:"build\Payload.zip",DNSParty.Payload.zip ^
+    /resource:"LICENSE",DNSParty.LICENSE ^
     /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll ^
     "src\Installer\InstallerProgram.cs" "src\DNSParty\VersionInfo.cs"
 

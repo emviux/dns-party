@@ -32,6 +32,8 @@ namespace DNSParty.Models
         // State tracking
         public string LastChangeText { get; set; }
         public string LastRequestedProfileId { get; set; }
+        public string LastRunVersion { get; set; }
+        public bool HasPromptedBackgroundBehavior { get; set; }
 
         // Updates
         public bool AutoCheckUpdates { get; set; }
@@ -60,6 +62,8 @@ namespace DNSParty.Models
 
             LastChangeText = "Ready";
             LastRequestedProfileId = "cloudflare";
+            LastRunVersion = string.Empty;
+            HasPromptedBackgroundBehavior = false;
 
             InitializedProfiles = false;
             FavoriteProfileIds = new List<string> { "cloudflare" };

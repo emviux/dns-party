@@ -92,7 +92,8 @@ namespace DNSParty.UI
             Font = Theme.CreateFont(9.5f);
             Icon = IconRenderer.GetAppIcon();
             Text = _isEditMode ? "Edit Custom DNS" : "Add Custom DNS";
-            ClientSize = new Size(460, 495);
+            float scale = GetDpiScale();
+            ClientSize = new Size(S(460, scale), S(610, scale));
             KeyPreview = true;
 
             InitializeInputs();
@@ -236,16 +237,17 @@ namespace DNSParty.UI
             _secondaryBoxBounds = new Rectangle(padX, secBoxY, contentW, boxH);
 
             // Favorite toggle row
-            int favY = S(356, scale);
+            int favY = S(366, scale);
             _favoriteToggleRect = new Rectangle(padX, favY, S(210, scale), S(30, scale));
 
             // Error banner
-            _errorBannerBounds = new Rectangle(padX, S(392, scale), contentW, S(34, scale));
+            _errorBannerBounds = new Rectangle(padX, S(408, scale), contentW, S(34, scale));
 
-            // Bottom buttons
+            // Bottom buttons (Footer area is bottom 80px)
+            int footerH = S(80, scale);
             int btnW = S(116, scale);
             int btnH = S(38, scale);
-            int btnY = h - btnH - S(22, scale);
+            int btnY = h - footerH + (footerH - btnH) / 2;
             _saveButtonRect = new Rectangle(w - padX - btnW, btnY, btnW, btnH);
             _cancelButtonRect = new Rectangle(_saveButtonRect.Left - S(12, scale) - btnW, btnY, btnW, btnH);
 
@@ -363,6 +365,18 @@ namespace DNSParty.UI
             using (SolidBrush bgBrush = new SolidBrush(Theme.WindowBackground))
             {
                 g.FillRectangle(bgBrush, ClientRectangle);
+            }
+
+            // Footer background
+            int footerH = S(80, scale);
+            Rectangle footerRect = new Rectangle(1, ClientSize.Height - footerH - 1, ClientSize.Width - 2, footerH);
+            using (SolidBrush footerBrush = new SolidBrush(Theme.SidebarBackground))
+            {
+                g.FillRectangle(footerBrush, footerRect);
+            }
+            using (Pen sepPen = new Pen(Theme.CardBorder, 1f))
+            {
+                g.DrawLine(sepPen, 0, footerRect.Top, ClientSize.Width, footerRect.Top);
             }
 
             // Titlebar header area
