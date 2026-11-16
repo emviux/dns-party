@@ -1,5 +1,7 @@
 # DNS Party — Windows DNS Manager
 
+[🇮🇷 فارسی (Persian)](README.fa.md)
+
 **DNS Party** is a fast, lightweight, gaming-inspired native Windows desktop utility for managing, testing, and switching between IPv4 and IPv6 DNS server configurations with 1-click System Tray integration.
 
 ---
