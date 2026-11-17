@@ -1,7 +1,7 @@
 @echo off
 setlocal
 echo ============================================================
-echo  Building DNS Party v1.2.0 (Portable + Setup Installer)
+echo  Building DNS Party v1.2.1 (Portable + Setup Installer)
 echo ============================================================
 
 set "CSC="
