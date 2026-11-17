@@ -1,0 +1,9 @@
+name = "dns-party-feedback"
+main = "src/index.js"
+compatibility_date = "2026-11-17"
+
+[observability]
+enabled = true
+
+[vars]
+GITHUB_REPO = "emviux/dns-party"

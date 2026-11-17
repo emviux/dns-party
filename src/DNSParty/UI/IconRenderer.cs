@@ -850,6 +850,49 @@ namespace DNSParty.UI
             }
         }
 
+                private static void DrawEmbeddedLogo(Graphics g, RectangleF bounds, string resName)
+        {
+            try
+            {
+                using (var stream = typeof(IconRenderer).Assembly.GetManifestResourceStream("DNSParty." + resName))
+                {
+                    if (stream != null)
+                    {
+                        using (Image img = Image.FromStream(stream))
+                        {
+                            g.DrawImage(img, bounds);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void DrawUnverifiedFallback(Graphics g, RectangleF bounds, string init)
+        {
+            float r = Math.Max(2f, bounds.Width * 0.2f);
+            RectangleF box = MapRect(bounds, 2.5f, 2.5f, 19f, 19f);
+
+            using (SolidBrush bgBrush = new SolidBrush(Color.FromArgb(60, 60, 60)))
+            using (Pen borderPen = new Pen(Color.FromArgb(100, 100, 100), 1f) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash })
+            {
+                Theme.FillRoundedRect(g, bgBrush, box, r);
+                Theme.DrawRoundedRect(g, borderPen, box, r);
+            }
+
+            float fontSize = bounds.Width * 0.35f;
+            using (Font f = Theme.CreateFont(fontSize))
+            using (SolidBrush textBrush = new SolidBrush(Color.FromArgb(180, 180, 180)))
+            {
+                StringFormat sf = new StringFormat
+                {
+                    Alignment = StringAlignment.Center,
+                    LineAlignment = StringAlignment.Center
+                };
+                g.DrawString(init, f, textBrush, box, sf);
+            }
+        }
+
         private static void DrawAbbreviationLogo(Graphics g, RectangleF bounds, string text, Color bgColor)
         {
             float r = Math.Max(2f, bounds.Width * 0.2f);

@@ -23,6 +23,8 @@ echo [1/3] Compiling DNSParty.exe...
     /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
     /win32manifest:"src\DNSParty\app.manifest" ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico",DNSParty.app.ico ^
+    /resource:"assets\providers\shecan.png",DNSParty.shecan.png ^
+    /resource:"assets\providers\begzar.png",DNSParty.begzar.png ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Branding\logo-transparent.png",DNSParty.logo-transparent.png ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Overlay\overlay-badge-256.png",DNSParty.overlay-badge-256.png ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png",DNSParty.installer-logo-512.png ^
@@ -72,6 +74,8 @@ powershell -NoProfile -Command "if (Test-Path 'build\Payload.zip') { Remove-Item
     /win32icon:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico" ^
     /win32manifest:"src\DNSParty\app.manifest" ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Icons\app.ico",DNSParty.app.ico ^
+    /resource:"assets\providers\shecan.png",DNSParty.shecan.png ^
+    /resource:"assets\providers\begzar.png",DNSParty.begzar.png ^
     /resource:"assets\new_logos\DNS-Party-Logo-Pack\Installer\installer-logo-512.png",DNSParty.installer-logo-512.png ^
     /resource:"build\Payload.zip",DNSParty.Payload.zip ^
     /resource:"LICENSE",DNSParty.LICENSE ^
@@ -105,3 +109,5 @@ echo  Build Complete:
 echo   - dist\DNSParty-Setup.exe     (Install Wizard)
 echo   - dist\DNSParty-Portable.exe  (Portable Executable)
 echo ============================================================
+
+

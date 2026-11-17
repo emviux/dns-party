@@ -69,7 +69,7 @@ namespace DNSParty.UI
         private Rectangle _minBtnRect;
         private Rectangle _closeBtnRect;
 
-        private readonly Rectangle[] _sidebarItemRects = new Rectangle[5];
+        private readonly Rectangle[] _sidebarItemRects = new Rectangle[6];
         private readonly List<CardHitBox> _cardHitBoxes = new List<CardHitBox>();
 
         private Rectangle _btnAddDnsRect;
@@ -882,6 +882,8 @@ namespace DNSParty.UI
             if (!_isHiddenInTray) Invalidate();
         }
 
+        private void OpenFeedbackDialog() { using (var dlg = new FeedbackDialog()) { dlg.ShowDialog(this); } }
+
         private void OpenAddDnsDialog()
         {
             using (var dlg = new AddEditDnsDialog(null))
@@ -1057,7 +1059,7 @@ namespace DNSParty.UI
 
             // Sidebar items (Left column: width 212)
             int navY = 68;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 _sidebarItemRects[i] = new Rectangle(16, navY + i * 48, 180, 40);
             }
@@ -1251,10 +1253,10 @@ namespace DNSParty.UI
 
         private void DrawSidebar(Graphics g, int h)
         {
-            string[] labels = { "Home", "Favorites", "Add DNS", "Settings", "About" };
-            string[] icons = { "home", "star", "plus", "settings", "info" };
+            string[] labels = { "Home", "Favorites", "Add DNS", "Settings", "About", "Feedback" };
+            string[] icons = { "home", "star", "plus", "settings", "info", "edit" };
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 Rectangle r = _sidebarItemRects[i];
                 bool isActive = (i == 0 && _activeTab == NavTab.Home) ||
@@ -1990,7 +1992,7 @@ namespace DNSParty.UI
             else if (_minBtnRect.Contains(e.Location)) _hoveredElement = "min";
             else
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     if (_sidebarItemRects[i].Contains(e.Location))
                     {
@@ -2101,7 +2103,7 @@ namespace DNSParty.UI
             }
 
             // Sidebar buttons
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 if (_sidebarItemRects[i].Contains(e.Location))
                 {
@@ -2109,7 +2111,7 @@ namespace DNSParty.UI
                     else if (i == 1) { _activeTab = NavTab.Favorites; _profileScrollOffset = 0; RecalculateLayout(); Invalidate(); }
                     else if (i == 2) { OpenAddDnsDialog(); }
                     else if (i == 3) { _activeTab = NavTab.Settings; RecalculateLayout(); Invalidate(); }
-                    else if (i == 4) { _activeTab = NavTab.About; RecalculateLayout(); Invalidate(); }
+                    else if (i == 4) { _activeTab = NavTab.About; RecalculateLayout(); Invalidate(); } else if (i == 5) { OpenFeedbackDialog(); }
                     return;
                 }
             }
@@ -2346,3 +2348,4 @@ namespace DNSParty.UI
         }
     }
 }
+
