@@ -825,24 +825,12 @@ namespace DNSParty.UI
                     DrawOpenDnsLogo(g, bounds);
                     break;
 
-                case "electro":
-                    DrawAbbreviationLogo(g, bounds, "EL", Color.FromArgb(34, 197, 94)); // #22c55e green
-                    break;
-                case "403online":
-                    DrawAbbreviationLogo(g, bounds, "403", Color.FromArgb(59, 130, 246)); // #3b82f6 blue
-                    break;
-                case "radargame":
-                    DrawAbbreviationLogo(g, bounds, "RG", Color.FromArgb(168, 85, 247)); // #a855f7 purple
-                    break;
-                case "shecan":
-                    DrawAbbreviationLogo(g, bounds, "SH", Color.FromArgb(6, 182, 212)); // #06b6d4 cyan
-                    break;
-                case "begzar":
-                    DrawAbbreviationLogo(g, bounds, "BG", Color.FromArgb(249, 115, 22)); // #f97316 orange
-                    break;
-                case "shatel":
-                    DrawAbbreviationLogo(g, bounds, "SHT", Color.FromArgb(234, 179, 8)); // #eab308 yellow
-                    break;
+                case "electro": DrawEmbeddedLogo(g, bounds, "Electro.png"); break;
+                case "403online": DrawEmbeddedLogo(g, bounds, "403_Online.png"); break;
+                case "radargame": DrawEmbeddedLogo(g, bounds, "Radar_Game.png"); break;
+                case "shecan": DrawEmbeddedLogo(g, bounds, "Shecan.png"); break;
+                case "begzar": DrawEmbeddedLogo(g, bounds, "Begzar.png"); break;
+                case "shatel": DrawEmbeddedLogo(g, bounds, "Shatel.png"); break;
 
                 default:
                     DrawCustomDnsLogo(g, bounds);
@@ -1094,3 +1082,5 @@ namespace DNSParty.UI
         }
     }
 }
+
+
